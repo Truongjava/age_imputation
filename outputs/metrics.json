@@ -1,0 +1,329 @@
+{
+  "cv": {
+    "mae": 8.799683570861816,
+    "rmse": 12.2963358313739,
+    "r2": 0.26200687885284424,
+    "bucket_acc": 0.43640565466599907,
+    "within_5y": 0.4609411121000443,
+    "within_10y": 0.6818693639717458
+  },
+  "folds": [
+    {
+      "mae": 8.782041690858172,
+      "rmse": 12.263139070471517,
+      "r2": 0.2654722745854927,
+      "bucket_acc": 0.43677919358168893,
+      "within_5y": 0.4596753974574521,
+      "within_10y": 0.6821852048491284,
+      "fold": 1,
+      "best_iter": 4000
+    },
+    {
+      "mae": 8.810570194316051,
+      "rmse": 12.317718744504429,
+      "r2": 0.259966123331569,
+      "bucket_acc": 0.43603442173259005,
+      "within_5y": 0.4614009084741763,
+      "within_10y": 0.681661652361148,
+      "fold": 2,
+      "best_iter": 4000
+    },
+    {
+      "mae": 8.795318414195613,
+      "rmse": 12.294826331738287,
+      "r2": 0.26382818622142834,
+      "bucket_acc": 0.4361966492640769,
+      "within_5y": 0.4619318349408607,
+      "within_10y": 0.6812560835324307,
+      "fold": 3,
+      "best_iter": 3989
+    },
+    {
+      "mae": 8.796021115658142,
+      "rmse": 12.284288396936951,
+      "r2": 0.2610130926628781,
+      "bucket_acc": 0.4370741527298469,
+      "within_5y": 0.46073725039082086,
+      "within_10y": 0.6824949119546942,
+      "fold": 4,
+      "best_iter": 4000
+    },
+    {
+      "mae": 8.814464702598954,
+      "rmse": 12.321610677252277,
+      "r2": 0.2597445298922296,
+      "bucket_acc": 0.4359438543191396,
+      "within_5y": 0.46096016930717526,
+      "within_10y": 0.6817489667174244,
+      "fold": 5,
+      "best_iter": 4000
+    }
+  ],
+  "baselines": {
+    "global_median": {
+      "mae": 12.066922187805176,
+      "rmse": 14.970813075468714,
+      "r2": -0.09393537044525146,
+      "bucket_acc": 0.17260137200348938,
+      "within_5y": 0.24927089731800822,
+      "within_10y": 0.5081773797137272
+    },
+    "postal_median_oof": {
+      "mae": 12.050214767456055,
+      "rmse": 14.7898476498529,
+      "r2": -0.06764853000640869,
+      "bucket_acc": 0.17598603072444233,
+      "within_5y": 0.22418534066700635,
+      "within_10y": 0.47464049983814105,
+      "n": 1356119
+    }
+  },
+  "n_customers": 1371980,
+  "n_labeled": 1356119,
+  "n_missing": 15861,
+  "best_iterations": [
+    4000,
+    4000,
+    3989,
+    4000,
+    4000
+  ],
+  "final_num_trees": 3997,
+  "n_features": 105,
+  "features": [
+    "active_flag",
+    "n_txn",
+    "n_uniq_art",
+    "total_spend",
+    "mean_price",
+    "median_price",
+    "max_price",
+    "std_price",
+    "n_days",
+    "online_share",
+    "weekend_share",
+    "n_txn_365d",
+    "mean_price_365d",
+    "n_txn_90d",
+    "recency",
+    "tenure",
+    "txn_per_active_day",
+    "repeat_item_ratio",
+    "spend_per_txn",
+    "recent_activity_ratio",
+    "price_trend",
+    "log_total_spend",
+    "club_code",
+    "news_code",
+    "index_group_name__0",
+    "index_group_name__1",
+    "index_group_name__2",
+    "index_group_name__3",
+    "index_group_name__4",
+    "index_group_name__5",
+    "index_name__0",
+    "index_name__1",
+    "index_name__2",
+    "index_name__3",
+    "index_name__4",
+    "index_name__5",
+    "index_name__6",
+    "index_name__7",
+    "index_name__8",
+    "index_name__9",
+    "index_name__10",
+    "index_name__11",
+    "index_name__12",
+    "garment_group_name__0",
+    "garment_group_name__1",
+    "garment_group_name__2",
+    "garment_group_name__3",
+    "garment_group_name__4",
+    "garment_group_name__5",
+    "garment_group_name__6",
+    "garment_group_name__7",
+    "garment_group_name__8",
+    "garment_group_name__9",
+    "garment_group_name__10",
+    "garment_group_name__11",
+    "garment_group_name__12",
+    "garment_group_name__13",
+    "garment_group_name__14",
+    "garment_group_name__15",
+    "section_name__0",
+    "section_name__1",
+    "section_name__2",
+    "section_name__3",
+    "section_name__4",
+    "section_name__5",
+    "section_name__6",
+    "section_name__7",
+    "section_name__8",
+    "section_name__9",
+    "section_name__10",
+    "section_name__11",
+    "section_name__12",
+    "section_name__13",
+    "section_name__14",
+    "section_name__15",
+    "product_type_name__0",
+    "product_type_name__1",
+    "product_type_name__2",
+    "product_type_name__3",
+    "product_type_name__4",
+    "product_type_name__5",
+    "product_type_name__6",
+    "product_type_name__7",
+    "product_type_name__8",
+    "product_type_name__9",
+    "product_type_name__10",
+    "product_type_name__11",
+    "product_type_name__12",
+    "product_type_name__13",
+    "product_type_name__14",
+    "product_type_name__15",
+    "product_type_name__16",
+    "product_type_name__17",
+    "product_type_name__18",
+    "product_type_name__19",
+    "product_type_name__20",
+    "te_article",
+    "te_department_no",
+    "te_product_type_no",
+    "te_index_name",
+    "te_section_name",
+    "te_product_type_name",
+    "art_enc_std",
+    "art_enc_max",
+    "art_enc_min"
+  ],
+  "lgb_params": {
+    "objective": "regression_l1",
+    "metric": "mae",
+    "learning_rate": 0.03,
+    "num_leaves": 63,
+    "min_data_in_leaf": 300,
+    "feature_fraction": 0.7,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 1,
+    "lambda_l2": 1.0,
+    "max_bin": 127,
+    "verbosity": -1,
+    "seed": 42
+  },
+  "top_importance": [
+    {
+      "feature": "te_article",
+      "gain": 2284962.0711638927
+    },
+    {
+      "feature": "art_enc_min",
+      "gain": 432647.7286684513
+    },
+    {
+      "feature": "art_enc_max",
+      "gain": 381840.5596394539
+    },
+    {
+      "feature": "te_department_no",
+      "gain": 351576.0396947861
+    },
+    {
+      "feature": "te_section_name",
+      "gain": 183371.6303870678
+    },
+    {
+      "feature": "txn_per_active_day",
+      "gain": 131910.65063405037
+    },
+    {
+      "feature": "index_group_name__1",
+      "gain": 122357.73451948166
+    },
+    {
+      "feature": "index_name__4",
+      "gain": 102327.8329436779
+    },
+    {
+      "feature": "n_days",
+      "gain": 97311.95539307594
+    },
+    {
+      "feature": "art_enc_std",
+      "gain": 92993.37788748741
+    },
+    {
+      "feature": "online_share",
+      "gain": 89310.73689484596
+    },
+    {
+      "feature": "recency",
+      "gain": 82788.3703444004
+    },
+    {
+      "feature": "tenure",
+      "gain": 65553.33488750458
+    },
+    {
+      "feature": "club_code",
+      "gain": 60332.96680569649
+    },
+    {
+      "feature": "mean_price_365d",
+      "gain": 59444.318663835526
+    },
+    {
+      "feature": "section_name__0",
+      "gain": 56737.42141199112
+    },
+    {
+      "feature": "weekend_share",
+      "gain": 56114.68945431709
+    },
+    {
+      "feature": "te_product_type_no",
+      "gain": 55367.34254741669
+    },
+    {
+      "feature": "index_group_name__2",
+      "gain": 54279.32521009445
+    },
+    {
+      "feature": "total_spend",
+      "gain": 53861.8417468071
+    },
+    {
+      "feature": "std_price",
+      "gain": 50248.670680999756
+    },
+    {
+      "feature": "te_index_name",
+      "gain": 49170.610866069794
+    },
+    {
+      "feature": "index_name__0",
+      "gain": 49036.93859374523
+    },
+    {
+      "feature": "max_price",
+      "gain": 44508.82190775871
+    },
+    {
+      "feature": "mean_price",
+      "gain": 43665.28895711899
+    }
+  ],
+  "imputed_stats": {
+    "mean": 37.710533727466554,
+    "std": 9.331405121340778,
+    "median": 36.36775718712937,
+    "min": 17.802107233403014,
+    "max": 68.58964577534186
+  },
+  "observed_stats": {
+    "mean": 36.386966705322266,
+    "std": 14.31362247467041,
+    "median": 32.0
+  },
+  "runtime_sec": 1604.5
+}
