@@ -45,7 +45,7 @@ nhãn (8,80) là **lạc quan** so với nhóm cần điền. Tôi ước lượ
 
 ### A5. Phân phối `age`?
 Lệch phải (skew ≈ 0,61): mean 36,39, median 32, p99 = 71. Đỉnh ở 20–26 tuổi (56% khách 20–39).
-Bị chặn dưới ở 16 (chỉ 161 khách đúng 16 → không phải堆积 biên), 99 hiếm (13 khách). Giá trị nguyên.
+Bị chặn dưới ở 16 (chỉ 161 khách đúng 16 → không phải dồn cục ở biên), 99 hiếm (13 khách). Giá trị nguyên.
 
 ### A6. Tại sao nhóm hàng nói được nhiều về tuổi?
 Sản phẩm có "độ tuổi người mua" đặc trưng: khách mua chủ yếu `Baby/Children` → mean age 41,2;
@@ -96,7 +96,8 @@ thành 99 → giá trị encoding của họ **không đổi**.
 - Feature hành vi có quan hệ **phi tuyến + không đơn điệu** với tuổi (tuổi tăng nhẹ theo giá
   decile nhưng **giảm** theo số giao dịch) → mô hình cây tự nhiên.
 - 1,37 triệu dòng, 105 chiều, chạy CPU 27 phút — đúng vùng GBDT mạnh.
-- Feature được Fisher-like ranking sẵn; target encoding lại dùng trực tiếp.
+- LightGBM xử lý tốt feature số thưa/one-hot (chia nhánh theo ngưỡng) nên 72 cột tỷ trọng
+  category dùng trực tiếp không cần giảm chiều.
 
 ### B6. Cấu hình LightGBM?
 `num_leaves=63, lr=0.03, min_data_in_leaf=300, feature_fraction=0.7, bagging=0.8, λ=1.0`,
@@ -189,7 +190,7 @@ không dùng nhãn. Baseline cũng tính OOF. Kiểm chứng bằng thực nghi�
 kỳ vọng trên nhóm thiếu là **~9,69 tuổi** bằng trộn sai số theo cơ cấu hoạt động của chính nhóm đó.
 
 **D5. "Vì sao không thử XGBoost/CatBoost/Random Forest?"**
-Chose LightGBM vì nhỏ gọn, nhanh trên CPU. Về nguyên lý, XGBoost/CatBoost thường cho kết quả
+Chọn LightGBM vì nhỏ gọn, nhanh trên CPU. Về nguyên lý, XGBoost/CatBoost thường cho kết quả
 ngang nhau trên tabular (chênh < 2%). Điểm cải tiến không nằm ở thuật toán mà ở feature engineering
 — tôi ưu tiên thời gian vào article-level target encoding, chỗ mang lại giảm 1,4 tuổi so với
 cùng pipeline không có nó.
@@ -201,13 +202,13 @@ cùng pipeline không có nó.
    co về trung bình ở nhóm 70+.
 4. Gán **khoảng tin cậy** thay vì điểm ước lượng: dự đoán phân phối hậu nghiệm theo mức hoạt động.
 
-**D7. "Bạn đã thử thêm clipping/calone gì chưa?"**
+**D7. "Bạn đã thử hiệu chỉnh (calibration) dự đoán chưa?"**
 Có — đã thử isotonic calibration trên dự đoán OOF: MAE tăng 8,80 → 9,35 vì dự đoán co về trung
 bình chính là tối ưu cho L1 loss. Ghi nhận là quyết định có ý thức, không phải bỏ qua.
 
 ---
 
-## Phụ lục — où tra cứu
+## Phụ lục — nơi tra cứu
 
 | Chủ đề | File |
 |---|---|
