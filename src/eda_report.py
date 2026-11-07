@@ -15,6 +15,12 @@ def main() -> None:
     s = json.loads((C.ARTIFACTS / "eda_stats.json").read_text())
     miss, target, signals = s["missingness"], s["target"], s["signals"]
     art, qual, impact = s["article_vs_postal"], s["quality"], s["missingness_impact"]
+    tq = s.get("temporal_quality", {})
+    tq_temporal = tq.get("temporal", {})
+    first12 = tq_temporal.get("mean_age_first12", 0)
+    last12 = tq_temporal.get("mean_age_last12", 0)
+    drop = first12 - last12
+    colour_spread = tq.get("colour_signal", {}).get("spread_years", 0)
     metrics = json.loads(C.METRICS_JSON.read_text()) if C.METRICS_JSON.exists() else None
 
     club_rows = "\n".join(
@@ -208,7 +214,29 @@ Ngoài ra có thể xuất kèm độ tin cậy theo mức hoạt động nếu 
 - `total_spend` và `log_total_spend` trùng thông tin (ρ = 1) nhưng GBDT bất biến với biến đổi đơn điệu
   → giữ cả hai không làm hỏng mô hình, chỉ tăng nhẹ số cột.
 
-## 7. Bảng quyết định: EDA → phương pháp
+## 7. Kiểm tra chất lượng dữ liệu & xu hướng thời gian
+
+| Kiểm tra | Kết quả | Hệ quả |
+|---|---|---|
+| Toàn vẹn tham chiếu (khoá mồ côi) | 0 lỗi customer_id, 0 lỗi article_id | Dữ liệu join nhất quán |
+| Dòng giao dịch trùng hoàn toàn (5 cột) | **2.974.905 dòng (9,36%)**, tối đa 1 nhóm lặp 569 lần | **Không drop** — feature dạng tỷ trọng chỉ tăng trọng số đúng cường độ mua; bài dự báo doanh số thì phải xử lý |
+| Cá voi (whale) | p99 = 187, p99.9 = 385, max = 1.895; 20 khách ≥ 1.000 giao dịch | Chấp nhận đuôi dài; GBDT chia theo ngưỡng nên không cần cắt |
+| Toàn vẹn bảng | 9.699 khách không giao dịch; 995 sản phẩm chưa bán | vẫn dự đoán được bằng thuộc tính tài khoản |
+
+![temporal](eda/fig8_temporal.png)
+
+**Xu hướng thời gian (2018-09 → 2020-09):** giao dịch **tăng vọt sau giãn cách COVID**
+(2020-04 → 07, đỉnh 1,9 triệu giao dịch/tháng), và người mua **trẻ hoá dần**:
+mean age từ {first12:.2f} (12 tháng đầu) → {last12:.2f} (12 tháng cuối), giảm {drop:.2f} tuổi.
+
+→ Hệ quả: cần feature **cửa sổ gần đây** (`n_txn_365d`, `mean_price_365d`, `recent_activity_ratio`)
+vì phân phối người mua trượt theo thời gian; không dùng "thời điểm giao dịch" làm feature trực tiếp.
+
+**Tín hiệu màu sắc (`colour_group_name`, chưa dùng trong model):** chênh mean age giữa các màu
+phổ biến chỉ **{colour_spread:.1f} tuổi** so với ~8 tuổi của nhóm hàng → **không đáng thêm**
+20+ cột màu: tín hiệu trùng lặp với thông tin nhóm hàng.
+
+## 8. Bảng quyết định: EDA → phương pháp
 
 | Phát hiện từ EDA | Quyết định thiết kế |
 |---|---|
@@ -220,8 +248,11 @@ Ngoài ra có thể xuất kèm độ tin cậy theo mức hoạt động nếu 
 | Thiếu age tập trung ở khách ít hoạt động (MNAR) | Báo cáo thêm MAE kỳ vọng trên nhóm thiếu (~{impact['expected_mae_on_missing']:.1f}); cảnh báo selection bias |
 | 31.788.324 giao dịch, RAM hạn chế | Polars streaming → Parquet gọn; X float32 + **memmap**; sample 700k/fold |
 | Encoding phụ thuộc nhãn | TE tính **theo từng fold**, baseline postal cũng OOF |
+| 9,36% dòng giao dịch trùng hoàn toàn | **Không drop** — feature dạng tỷ trọng chỉ tăng trọng số đúng cường độ mua |
+| Người mua trẻ hoá theo thời gian + COVID | Cần feature cửa sổ gần đây (`n_txn_365d`, `recent_activity_ratio`) |
+| Màu sắc tín hiệu yếu (chênh ~5 tuổi vs ~8 của nhóm hàng) | Không thêm cột màu — trùng thông tin nhóm hàng |
 
-## 8. Kết luận
+## 9. Kết luận
 
 Dữ liệu **không cho phép** dự đoán tuổi chính xác cao: hành vi mua chỉ giải thích được khoảng
 1/4 phương sai tuổi. Nhưng so với baseline median (MAE 12.07), mô hình đạt **MAE {model_mae}**

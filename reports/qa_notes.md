@@ -31,6 +31,11 @@ Càng xuống sâu càng chi tiết — tôi dùng chính phân tầng này cho 
 | Outlier hoạt động | 9.699 khách 0 giao dịch; 995 sản phẩm chưa bán | vẫn phải dự đoán cho họ, nhưng tài nguyên: chỉ có thuộc tính tài khoản |
 | Kênh bán | 70,4% online, 29,6% offline | chỉ 2 giá trị → feature `online_share` |
 | Thời gian | đúng 734 ngày, không có gap | dữ liệu hoàn chỉnh về thời gian |
+| Dòng trùng hoàn toàn | **2.974.905 dòng (9,36%)**, max 1 nhóm lặp 569 lần | **không drop** cho age imputation — feature dạng tỷ trọng chỉ tăng trọng số đúng cường độ mua; bài dự báo doanh số thì phải xử lý |
+| Khoá mồ côi | 0 lỗi customer_id, 0 lỗi article_id | tham chiếu toàn vẹn, join an toàn |
+| Whale | 20 khách ≥ 1.000 giao dịch (max 1.895); p99 = 187 | đuôi dài — chấp nhận, GBDT chia theo ngưỡng |
+| Xu hướng thời gian | mean age người mua 36,6 → 35,5 (giảm ~1,1 tuổi); giao dịch tăng vọt 2020-04→07 (COVID) | cần feature cửa sổ gần đây; không dùng thời điểm giao dịch trực tiếp |
+| Màu sắc | chênh mean age giữa các màu chỉ ~5,4 tuổi (vs ~8 của nhóm hàng) | không đáng thêm cột màu — trùng thông tin nhóm hàng |
 
 ### A4. `age` thiếu như thế nào — có phải ngẫu nhiên không?
 **Không — MNAR** (Missing Not At Random), bằng chứng:
@@ -43,11 +48,30 @@ Càng xuống sâu càng chi tiết — tôi dùng chính phân tầng này cho 
 nhãn (8,80) là **lạc quan** so với nhóm cần điền. Tôi ước lượng MAE kỳ vọng trên nhóm thiếu là
 **~9,69 tuổi** bằng trộn theo cơ cấu hoạt động.
 
-### A5. Phân phối `age`?
+
+### A5. Dữ liệu có "sạch" không — trùng lặp, khoá sai, giá trị lạ?
+- **Toàn vẹn tham chiếu:** mọi `customer_id`/`article_id` trong transactions đều tồn tại ở bảng
+  cha (0 khoá mồ côi) → join an toàn.
+- **Trùng lặp:** 9,36% dòng trùng cả 5 cột (max một nhóm lặp 569 lần). Quyết định: **giữ nguyên**
+  vì feature ở dạng tỷ trọng/trung bình — dòng trùng chỉ tăng trọng số đúng cường độ mua. Nếu
+  làm bài dự báo doanh số thì phải đổi cách xử lý.
+- **Whale:** 20 khách ≥ 1.000 giao dịch. Feature gốc tuyệt đối (`n_txn`) bị whale kéo, nên tôi
+  dùng thêm feature tỷ lệ (`txn_per_active_day`, `repeat_item_ratio`).
+- **Xu hướng thời gian:** người mua trẻ hoá (mean age ≈ 37 → ≈ 35) và giao dịch tăng vọt sau
+  giãn cách COVID 2020. Vì thế feature "cửa sổ gần đây" (`n_txn_365d`, `recent_activity_ratio`)
+  quan trọng; không đưa ngày tháng vào feature trực tiếp.
+
+### A6. COVID có làm lệch kết quả không?
+Có ảnh hưởng nhưng kiểm soát được: giãn cách 2020 kéo khách trẻ vào (online tăng). Vì tôi dùng
+**toàn bộ lịch sử 2 năm** làm feature (không chỉ 2020), và encoding là *tuổi người mua mỗi món*
+(nhóm hàng trẻ/t già tách nhau ổn định qua các năm), xu hướng thời gian không làm sai lệch lớn.
+EDA (mục 7 của `eda_report.md`) có biểu đồ minh hoạ.
+
+### A7. Phân phối `age`?
 Lệch phải (skew ≈ 0,61): mean 36,39, median 32, p99 = 71. Đỉnh ở 20–26 tuổi (56% khách 20–39).
 Bị chặn dưới ở 16 (chỉ 161 khách đúng 16 → không phải dồn cục ở biên), 99 hiếm (13 khách). Giá trị nguyên.
 
-### A6. Tại sao nhóm hàng nói được nhiều về tuổi?
+### A8. Tại sao nhóm hàng nói được nhiều về tuổi?
 Sản phẩm có "độ tuổi người mua" đặc trưng: khách mua chủ yếu `Baby/Children` → mean age 41,2;
 `Divided` (dòng trẻ) → 32,8; `Ladieswear` → 36,7; `Menswear` → 38,6; `Sport` → 37,1.
 Ở mức sản phẩm: mean buyer age trải 29,8–45,9 (sản phẩm ≥50 người mua) — khoảng 16 tuổi chênh.
@@ -205,6 +229,14 @@ cùng pipeline không có nó.
 **D7. "Bạn đã thử hiệu chỉnh (calibration) dự đoán chưa?"**
 Có — đã thử isotonic calibration trên dự đoán OOF: MAE tăng 8,80 → 9,35 vì dự đoán co về trung
 bình chính là tối ưu cho L1 loss. Ghi nhận là quyết định có ý thức, không phải bỏ qua.
+
+
+**D8. "Dữ liệu có 9% dòng trùng — bạn xử lý sao?"**
+Đã lượng hoá (2.974.905 dòng trùng cả 5 cột). Quyết định **giữ nguyên** vì lý do bài học:
+feature của tôi ở dạng *tỷ trọng mua* và *target encoding có trọng số*, dòng trùng tăng cường độ
+mua của món đó — đúng thực tế hành vi, không phải nhiễu. Kiểm tra riêng cho bài dự báo doanh số
+thì phải dedup. Cá voi (20 khách > 1.000 giao dịch) cũng không cắt: GBDT chia theo ngưỡng nên
+tự chống được đuôi dài.
 
 ---
 

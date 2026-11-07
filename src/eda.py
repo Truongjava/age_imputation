@@ -384,6 +384,102 @@ def redundancy_and_quality(y: np.ndarray, base: pl.DataFrame) -> dict:
     }
 
 
+def temporal_and_quality_customers(customers: pl.DataFrame) -> dict:
+    """Kiem tra chat luong du lieu: referential integrity, duplicates, whales, xu huong thoi gian, mau sac."""
+    txn = pl.scan_csv(
+        C.TXN_CSV,
+        schema_overrides={
+            "t_dat": pl.String,
+            "customer_id": pl.String,
+            "article_id": pl.String,
+            "price": pl.Float32,
+            "sales_channel_id": pl.Int8,
+        },
+    )
+    lab = customers.select("customer_id", "age").drop_nulls("age")
+    articles = pl.read_csv(C.ARTICLES_CSV, schema_overrides={"article_id": pl.String})
+
+    # A) referential integrity
+    tx_keys = txn.select("customer_id", "article_id").unique().collect(engine="streaming")
+    cust_set = customers["customer_id"]
+    art_set = articles["article_id"]
+    n_bad_cust = int((~tx_keys["customer_id"].is_in(cust_set)).sum())
+    n_bad_art = int((~tx_keys["article_id"].is_in(art_set)).sum())
+
+    # B) duplicates
+    dup = (
+        txn.group_by(["customer_id", "article_id", "t_dat", "price", "sales_channel_id"])
+        .agg(pl.len().alias("n"))
+        .collect(engine="streaming")
+    )
+    n_dup_rows = int((dup["n"] - 1).sum())
+
+    # C) whales
+    per_cust = txn.group_by("customer_id").agg(n=pl.len()).collect(engine="streaming")
+    pcs = np.sort(per_cust["n"].to_numpy())
+
+    # D) temporal trend
+    monthly = (
+        txn.with_columns(month=pl.col("t_dat").str.slice(0, 7))
+        .join(lab.lazy(), on="customer_id", how="inner")
+        .group_by("month")
+        .agg(n=pl.len(), mean_age=pl.col("age").mean())
+        .sort("month")
+        .collect(engine="streaming")
+    )
+
+    fig, axes = plt.subplots(2, 1, figsize=(9, 5), sharex=True)
+    axes[0].bar(range(monthly.height), monthly["n"].to_numpy(), color="#4C78A8")
+    axes[0].set_ylabel("giao dịch/tháng")
+    axes[0].set_title("Giao dịch theo tháng — tăng vọt 2020-04→07 (sau giãn cách COVID)")
+    axes[1].plot(range(monthly.height), monthly["mean_age"].to_numpy(), "o-", color="#E45756", ms=3)
+    axes[1].set_ylabel("mean age")
+    axes[1].set_xlabel("tháng")
+    axes[1].set_xticks(range(0, monthly.height, 3))
+    axes[1].set_xticklabels(monthly["month"].to_list()[::3], rotation=45, ha="right", fontsize=7)
+    plt.tight_layout()
+    fig.savefig(EDA_DIR / "fig8_temporal.png")
+    plt.close(fig)
+
+    # E) colour signal
+    colour = (
+        txn.join(articles.select("article_id", "colour_group_name").lazy(), on="article_id", how="left")
+        .join(lab.lazy(), on="customer_id", how="inner")
+        .group_by("colour_group_name")
+        .agg(n=pl.len(), mean_age=pl.col("age").mean())
+        .filter(pl.col("n") > 100_000)
+        .sort("mean_age")
+        .collect(engine="streaming")
+    )
+
+    return {
+        "referential_integrity": {"bad_customer_keys": n_bad_cust, "bad_article_keys": n_bad_art},
+        "duplicates": {
+            "n_duplicate_rows": n_dup_rows,
+            "share_pct": round(n_dup_rows / 31_788_324 * 100, 2),
+            "max_repeat": int(dup["n"].max()),
+        },
+        "activity_tails": {
+            "p90": float(np.percentile(pcs, 90)),
+            "p99": float(np.percentile(pcs, 99)),
+            "p99.9": float(np.percentile(pcs, 99.9)),
+            "max": int(pcs.max()),
+            "whales_ge_1000": int((pcs >= 1000).sum()),
+        },
+        "temporal": {
+            "mean_age_first12": float(monthly["mean_age"].head(12).mean()),
+            "mean_age_last12": float(monthly["mean_age"].tail(12).mean()),
+            "peak_month_n": int(monthly["n"].max()),
+            "monthly": monthly.to_dicts(),
+        },
+        "colour_signal": {
+            "spread_years": float(colour["mean_age"].max() - colour["mean_age"].min()),
+            "n_colours": colour.height,
+            "by_colour": colour.to_dicts(),
+        },
+    }
+
+
 def missingness_impact(y: np.ndarray, base: pl.DataFrame) -> dict:
     """Thieu age co tuong quan voi muc do hoat dong -> anh huong gi khi dien?"""
     n_txn = base.get_column("n_txn").to_numpy()
@@ -457,6 +553,9 @@ def main() -> None:
     print("+ missingness impact...")
     impact_stats = missingness_impact(y, base)
 
+    print("+ temporal & quality (duplicates, whales, colour)...")
+    temporal_stats = temporal_and_quality_customers(cust)
+
     stats = {
         "missingness": miss_stats,
         "target": target_stats,
@@ -464,6 +563,7 @@ def main() -> None:
         "article_vs_postal": art_stats,
         "quality": qual_stats,
         "missingness_impact": impact_stats,
+        "temporal_quality": temporal_stats,
     }
     STATS_JSON.write_text(json.dumps(stats, indent=2, ensure_ascii=False))
     print(f"wrote {STATS_JSON}")
