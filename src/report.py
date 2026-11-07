@@ -68,7 +68,7 @@ def eda_summary() -> str:
     )
     return f"""## 3. EDA dẫn dắt thiết kế (tóm tắt)
 
-Báo cáo EDA đầy đủ: [`outputs/eda_report.md`](eda_report.md) — biểu đồ trong `outputs/eda/`.
+Báo cáo EDA đầy đủ: [`reports/eda_report.md`](eda_report.md) — biểu đồ trong `reports/eda/`.
 
 | Phát hiện từ EDA | Số liệu | Quyết định kéo theo |
 |---|---|---|
@@ -241,7 +241,7 @@ objective="{p['objective']}", metric="{p['metric']}"
 python -m pip install -r requirements.txt
 $env:PYTHONPATH="."
 
-python -m src.eda            # EDA -> outputs/eda_report.md + outputs/eda/*.png
+python -m src.eda            # EDA -> reports/eda_report.md + reports/eda/*.png
 python -m src.eda_report
 python -m src.prepare_data   # CSV gốc -> parquet gọn
 python -m src.features       # feature + ma trận đếm
@@ -255,7 +255,7 @@ python -m src.report         # báo cáo này
 
 - `age` là thông tin **tự nguyện khai báo**, nên nhóm thiếu có thể khác nhóm có nhãn
   (thiên lệch chọn mẫu). EDA cho thấy nhóm thiếu **ít hoạt động hơn** (median 4 so với 9 giao dịch),
-  nên MAE kỳ vọng trên nhóm thiếu là **~9,7 tuổi** (xem `outputs/eda_report.md` mục 5),
+  nên MAE kỳ vọng trên nhóm thiếu là **~9,7 tuổi** (xem `reports/eda_report.md` mục 5),
   không phải {fmt(cv['mae'])} như trên nhóm có nhãn.
 - Độ chính xác bị chặn trên bởi dữ liệu: hành vi mua chỉ giải thích được ~{cv['r2'] * 100:.0f}% phương sai tuổi
   (R² = {fmt(cv['r2'], 3)}). Các nhóm tuổi gần nhau (ví dụ 25–35) gần như không phân biệt được.

@@ -8,7 +8,7 @@ Tra loi cac cau hoi:
   5. Da cong tuyen / trung lap giua cac dac trung?
   6. Tu do chon: muc tieu loss, mo hinh, feature set, cach danh gia.
 
-Xuat: outputs/eda/*.png, outputs/eda_report.md, artifacts/eda_stats.json
+Xuat: reports/eda/*.png, reports/eda_report.md, artifacts/eda_stats.json
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ from scipy.stats import spearmanr
 
 from src import config as C
 
-EDA_DIR = C.OUTPUTS / "eda"
+EDA_DIR = C.EDA_DIR
 STATS_JSON = C.ARTIFACTS / "eda_stats.json"
 
 plt.rcParams.update({"figure.dpi": 110, "font.size": 9, "axes.grid": True, "grid.alpha": 0.3})

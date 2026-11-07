@@ -34,9 +34,9 @@ transactions_train.csv
 ## Ghi chú
 
 - Notebook 4 mặc định `TRAIN_FROM_SCRATCH = False` → đọc lại `outputs/oof_pred.npy` và
-  `outputs/metrics.json` để hiển thị kết quả tức thì. Đổi thành `True` nếu muốn train lại đầy đủ
+  `reports/metrics.json` để hiển thị kết quả tức thì. Đổi thành `True` nếu muốn train lại đầy đủ
   5 fold (cần ~4 GB RAM, ~27 phút trên CPU 6 lõi).
 - Các bước 01–02 ghi artifact vào `artifacts/` (đã ignore trong `.gitignore`) để notebook 03–05
   chạy nhanh.
-- Báo cáo dạng văn bản: [`outputs/eda_report.md`](../outputs/eda_report.md) và
-  [`outputs/age_imputation_report.md`](../outputs/age_imputation_report.md).
+- Báo cáo dạng văn bản: [`reports/eda_report.md`](../outputs/eda_report.md) và
+  [`reports/age_imputation_report.md`](../outputs/age_imputation_report.md).

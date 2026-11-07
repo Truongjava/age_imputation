@@ -4,20 +4,27 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-CUSTOMERS_CSV = ROOT / "customers.csv"
-ARTICLES_CSV = ROOT / "articles.csv"
-TXN_CSV = ROOT / "transactions_train.csv"
+DATA = ROOT / "data"
+CUSTOMERS_CSV = DATA / "customers.csv"
+ARTICLES_CSV = DATA / "articles.csv"
+TXN_CSV = DATA / "transactions_train.csv"
 
 ARTIFACTS = ROOT / "artifacts"
+REPORTS = ROOT / "reports"
 OUTPUTS = ROOT / "outputs"
 
+# Cac file ket qua nho (bao cao, bieu do, metrics) nam o reports/;
+# outputs/ chi chua file lon co the sinh lai.
 TXN_PARQUET = ARTIFACTS / "transactions_compact.parquet"
 CUSTOMER_FEATURES_PARQUET = ARTIFACTS / "customer_features.parquet"
 CATEGORY_MAPS_JSON = ARTIFACTS / "category_maps.json"
 FEATURE_META_JSON = ARTIFACTS / "feature_meta.json"
-METRICS_JSON = OUTPUTS / "metrics.json"
+METRICS_JSON = REPORTS / "metrics.json"
+EDA_STATS_JSON = ARTIFACTS / "eda_stats.json"
+EDA_DIR = REPORTS / "eda"
 IMPUTED_CSV = OUTPUTS / "customers_age_imputed.csv"
-REPORT_MD = OUTPUTS / "age_imputation_report.md"
+REPORT_MD = REPORTS / "age_imputation_report.md"
+EDA_REPORT_MD = REPORTS / "eda_report.md"
 
 AGE_MIN, AGE_MAX = 16, 99
 

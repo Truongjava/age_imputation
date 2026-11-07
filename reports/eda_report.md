@@ -4,7 +4,7 @@ Báo cáo này là **bước 0**: phân tích dữ liệu trước khi chọn ph
 Mọi lựa chọn thiết kế ở pipeline (`features.py`, `target_encoding.py`, `train.py`)
 đều bắt nguồn từ các phát hiện dưới đây.
 
-- Script: `src/eda.py` → số liệu tại `artifacts/eda_stats.json`, biểu đồ tại `outputs/eda/`
+- Script: `src/eda.py` → số liệu tại `artifacts/eda_stats.json`, biểu đồ tại `reports/eda/`
 - Dữ liệu: `customers.csv` (1.371.980 dòng), `articles.csv` (105.542), `transactions_train.csv`
   (31.788.324 giao dịch, 2018-09-20 → 2020-09-22)
 

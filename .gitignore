@@ -1,14 +1,12 @@
 # ---- Dữ liệu gốc Kaggle (quá lớn để đưa lên Git) ----
 # Tải tại: https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations/data
-*.csv
-sample_submission.csv
+data/
 
 # ---- Artifact trung gian (sinh lại bằng notebook 01/02/03/04) ----
 artifacts/
 
-# ---- Output lớn (sinh lại bằng notebook 05) ----
-outputs/*.npy
-outputs/customers_age_imputed.csv
+# ---- Kết quả lớn, sinh lại được (báo cáo & biểu đồ nằm ở reports/, được commit) ----
+outputs/
 
 # ---- Python ----
 __pycache__/

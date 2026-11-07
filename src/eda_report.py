@@ -1,4 +1,4 @@
-﻿"""Sinh bao cao EDA (outputs/eda_report.md) tu artifacts/eda_stats.json."""
+﻿"""Sinh bao cao EDA (reports/eda_report.md) tu artifacts/eda_stats.json."""
 
 from __future__ import annotations
 
@@ -60,7 +60,7 @@ Báo cáo này là **bước 0**: phân tích dữ liệu trước khi chọn ph
 Mọi lựa chọn thiết kế ở pipeline (`features.py`, `target_encoding.py`, `train.py`)
 đều bắt nguồn từ các phát hiện dưới đây.
 
-- Script: `src/eda.py` → số liệu tại `artifacts/eda_stats.json`, biểu đồ tại `outputs/eda/`
+- Script: `src/eda.py` → số liệu tại `artifacts/eda_stats.json`, biểu đồ tại `reports/eda/`
 - Dữ liệu: `customers.csv` (1.371.980 dòng), `articles.csv` (105.542), `transactions_train.csv`
   (31.788.324 giao dịch, 2018-09-20 → 2020-09-22)
 
@@ -229,7 +229,7 @@ Dữ liệu **không cho phép** dự đoán tuổi chính xác cao: hành vi mu
 (1) dùng `postal_code`/địa lý tưởng như có tín hiệu nhưng thực chất không có;
 (2) tối ưu trên nhóm có nhãn rồi báo cáo như thể áp dụng được nguyên vẹn cho nhóm thiếu.
 """
-    path = C.OUTPUTS / "eda_report.md"
+    path = C.EDA_REPORT_MD
     path.write_text(report, encoding="utf-8")
     print(f"wrote {path}")
 

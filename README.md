@@ -34,7 +34,7 @@ biểu đồ đã nhúng sẵn:
 
 `src/eda.py` chạy **trước** pipeline và trả lời: thiếu age có ngẫu nhiên không, phân phối target
 ra sao, đặc trưng nào thực sự có tín hiệu, feature nào trùng lặp. Kết quả ghi ở
-`outputs/eda_report.md` + `outputs/eda/*.png`. Các kết luận chính:
+`reports/eda_report.md` + `reports/eda/*.png`. Các kết luận chính:
 
 | Phát hiện | Số liệu | Quyết định |
 |---|---|---|
@@ -48,22 +48,24 @@ ra sao, đặc trưng nào thực sự có tín hiệu, feature nào trùng lặ
 ## Cấu trúc
 
 ```
-customers.csv, articles.csv, transactions_train.csv   # dữ liệu gốc (tải từ Kaggle, không commit)
+data/                 # CSV gốc từ Kaggle (~4 GB, ignored — xem data/README.md)
 notebooks/            # 6 notebook kể lại toàn bộ quá trình (đã chạy sẵn)
   00_EDA.ipynb ... 05_imputation_report.ipynb
 src/                  # pipeline dạng script (dùng chung logic với notebook)
   config.py           # đường dẫn, tham số, danh sách category
   eda.py              # EDA: missingness, phân phối, tương quan, article vs postal
-  eda_report.py       # xuất outputs/eda_report.md
+  eda_report.py       # xuất reports/eda_report.md
   prepare_data.py     # CSV gốc -> parquet gọn (giao dịch dạng số nguyên)
   features.py         # RFM + tỷ trọng category + ma trận cust x article
   dataset.py          # ma trận X float32 ghi ra .npy (memmap)
   target_encoding.py  # target encoding theo fold (article/department/...)
   train.py            # 5-fold CV, LightGBM L1, dự đoán, baseline OOF
   impute.py           # xuất outputs/customers_age_imputed.csv
-  report.py           # xuất outputs/age_imputation_report.md
-artifacts/            # trung gian (ignored by git)
-outputs/              # kết quả cuối (báo cáo + biểu đồ được commit)
+  report.py           # xuất reports/age_imputation_report.md
+reports/              # báo cáo + biểu đồ + metrics (commit lên GitHub)
+  eda/                # 7 biểu đồ EDA
+artifacts/            # trung gian (ignored)
+outputs/              # file kết quả lớn, sinh lại được (ignored)
 ```
 
 ## Chạy
@@ -78,7 +80,7 @@ Xem [`notebooks/README.md`](notebooks/README.md): mở lần lượt `00_EDA` �
 python -m pip install -r requirements.txt
 $env:PYTHONPATH="."
 
-python -m src.eda            # EDA (~2 phút) -> outputs/eda_report.md, outputs/eda/*.png
+python -m src.eda            # EDA (~2 phút) -> reports/eda_report.md, reports/eda/*.png
 python -m src.eda_report
 python -m src.prepare_data   # ~1 phút  -> transactions_compact.parquet
 python -m src.features       # ~2 phút  -> base features + ma trận đếm
@@ -99,7 +101,7 @@ python -m src.report         # ghi báo cáo Markdown
 | `age_filled` | tuổi sau khi điền (giá trị gốc nếu đã có) |
 | `age_source` | `observed` hoặc `imputed` |
 
-`outputs/age_imputation_report.md` — báo cáo đầy đủ (kiến trúc, đặc trưng, CV theo fold,
+`reports/age_imputation_report.md` — báo cáo đầy đủ (kiến trúc, đặc trưng, CV theo fold,
 baseline, sai số theo nhóm tuổi, feature importance).
 
 ## Thiết kế chống rò rỉ
@@ -114,7 +116,7 @@ baseline, sai số theo nhóm tuổi, feature importance).
 
 - `age` là khai báo tự nguyện → nhóm thiếu khác nhóm có nhãn (MNAR): nhóm thiếu ít hoạt động hơn
   (median 4 vs 9 giao dịch) nên **MAE kỳ vọng trên nhóm thiếu ≈ 9.7 tuổi**, cao hơn 8.80 đo trên
-  nhóm có nhãn (xem `outputs/eda_report.md` mục 5).
+  nhóm có nhãn (xem `reports/eda_report.md` mục 5).
 - Trần chính xác do dữ liệu: hành vi mua giải thích ~26% phương sai tuổi; các nhóm tuổi
   liền kề (25–35) gần như không phân biệt được. Dự đoán co về trung bình — đây là hành vi
   tối ưu cho MAE (isotonic calibration làm MAE tăng lên 9.35, nên không dùng).
