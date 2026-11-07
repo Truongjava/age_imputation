@@ -63,6 +63,7 @@ src/                  # pipeline dạng script (dùng chung logic với notebook
   impute.py           # xuất outputs/customers_age_imputed.csv
   report.py           # xuất reports/age_imputation_report.md
 reports/              # báo cáo + biểu đồ + metrics (commit lên GitHub)
+  qa_notes.md         # tài liệu ôn Q&A để bảo vệ (4 phần: dữ liệu, phương pháp, kết quả, câu hỏi khó)
   eda/                # 7 biểu đồ EDA
 artifacts/            # trung gian (ignored)
 outputs/              # file kết quả lớn, sinh lại được (ignored)

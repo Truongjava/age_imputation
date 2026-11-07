@@ -66,7 +66,7 @@ tính **chỉ trên tập train của fold**:
 
 ## 3. EDA dẫn dắt thiết kế (tóm tắt)
 
-Báo cáo EDA đầy đủ: [`reports/eda_report.md`](eda_report.md) — biểu đồ trong `reports/eda/`.
+Báo cáo EDA đầy đủ: [`eda_report.md`](eda_report.md) — biểu đồ trong `reports/eda/`; tóm tắt tổng hợp Q&A: [`qa_notes.md`](qa_notes.md).
 
 | Phát hiện từ EDA | Số liệu | Quyết định kéo theo |
 |---|---|---|
